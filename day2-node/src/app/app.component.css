@@ -1,0 +1,13 @@
+mat-card {
+  width: 80%;
+  margin: auto;
+}
+mat-form-field, textarea {
+  width: 100%;
+}
+
+main {
+  width: 80%;
+  /* looks like this doesn't work? confirm */
+  margin: 1rem auto;
+}
