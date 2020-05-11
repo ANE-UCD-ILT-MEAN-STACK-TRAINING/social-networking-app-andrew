@@ -7,6 +7,10 @@
       </label>
       <mat-error *ngIf="title.invalid">Please enter a Post Title</mat-error>
     </mat-form-field>
+    <div>
+      <button mat-button type="button">Pick Image</button>
+      <input type="file" #filePicker>
+    </div>
     <mat-form-field>
       <label>
         <textarea matInput rows="4" required name="content" #content="ngModel" placeholder="Enter some content"

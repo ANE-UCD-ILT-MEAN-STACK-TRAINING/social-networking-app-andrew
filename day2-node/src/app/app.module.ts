@@ -16,26 +16,26 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    PostCreateComponent,
-    HeaderComponent,
-    PostListComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    BrowserAnimationsModule,
-    MatInputModule,
-    MatCardModule,
-    MatButtonModule,
-    MatToolbarModule,
-    MatExpansionModule,
-    HttpClientModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        PostCreateComponent,
+        HeaderComponent,
+        PostListComponent
+    ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        BrowserAnimationsModule,
+        MatInputModule,
+        MatCardModule,
+        MatButtonModule,
+        MatToolbarModule,
+        MatExpansionModule,
+        HttpClientModule
+    ],
+    providers: [],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
 }
