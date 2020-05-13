@@ -47,11 +47,20 @@ export class PostService {
     }
 
     addPost(title: string, content: string) {
-        const post: Post = {id: null, title: title, content: content}
+        const postData = new FormData();
+        postData.append("title", title);
+        postData.append("content", content);
+        postData.append("image", image, title);
+
         this.http
-            .post<{ message: string, postId: string }>(this.postsUrl, post)
+            .post<{ message: string, post: Post }>(this.postsUrl, postData)
             .subscribe(responseData => {
-                post.id = responseData.postId
+                const post: Post = {
+                    id: responseData.post.id,
+                    title: title,
+                    content: content,
+                    imagePath: responseData.post.imagePath
+                }
                 this.posts.push(post);
                 this.postsUpdated.next([...this.posts]);
                 this.router.navigate(['/']);
