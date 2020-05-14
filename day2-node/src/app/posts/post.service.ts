@@ -8,7 +8,7 @@ import {Router} from "@angular/router";
 @Injectable({providedIn: 'root'})
 export class PostService {
     private posts: Post[] = [];
-    private postsUpdated = new Subject<Post[]>();
+    private postsUpdated = new Subject<{ posts: Post[], postCount: number }>();
 
     constructor(private http: HttpClient, private router: Router) {
     }
@@ -23,23 +23,32 @@ export class PostService {
     }
 
     // get all
-    getPosts() {
+    getPosts(postsPerPage: number, currentPage: number) {
+        const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}`;
         this.http
             // should switch to using an object, define data structure
-            .get<{ message: string; posts: any }>(this.postsUrl)
+            .get<{ message: string; posts: any, maxPosts: number }>(
+                this.postsUrl + queryParams)
             .pipe(map((postData) => {
-                return postData.posts.map(post => {
-                    return {
-                        title: post.title,
-                        content: post.content,
-                        id: post._id,
-                        imagePath: post.imagePath
-                    };
-                });
+                return {
+                    posts: postData.posts.map(post => {
+                        return {
+                            title: post.title,
+                            content: post.content,
+                            id: post._id,
+                            imagePath: post.imagePath
+                        };
+                    }),
+                    maxPosts: postData.maxPosts
+                }
             }))
-            .subscribe(transformedPosts => {
-                this.posts = transformedPosts;
-                this.postsUpdated.next([...this.posts]);
+            .subscribe(transformedPostData => {
+                this.posts = transformedPostData.posts;
+                this.postsUpdated.next({
+                    posts: [...this.posts],
+                    postCount: transformedPostData.maxPosts
+                });
+
             })
     }
 
@@ -56,14 +65,6 @@ export class PostService {
         this.http
             .post<{ message: string, post: Post }>(this.postsUrl, postData)
             .subscribe(responseData => {
-                const post: Post = {
-                    id: responseData.post.id,
-                    title: title,
-                    content: content,
-                    imagePath: responseData.post.imagePath
-                }
-                this.posts.push(post);
-                this.postsUpdated.next([...this.posts]);
                 this.router.navigate(['/']);
             })
     }
@@ -82,36 +83,15 @@ export class PostService {
                 id: id,
                 title: title,
                 content: content,
-                imagePath :image
+                imagePath: image
             }
         }
 
         this.http.put<{ message: string, postId: string }>(this.postsUrl + id, postData)
-            .subscribe(responseData => {
-                console.log(responseData)
-                const updatedPosts = [...this.posts]
-                const oldPostIndex = updatedPosts.findIndex(p => p.id == post.id);
-                const post: Post = {
-                    id: id,
-                    title: title,
-                    content: content,
-                    imagePath: "" // TODO responseData.imagePath
-                };
-                updatedPosts[oldPostIndex] = post;
-                this.posts = updatedPosts;
-                this.postsUpdated.next([...this.posts])
-                this.router.navigate(['/']);
-            })
+            .subscribe(responseData => this.router.navigate(['/']))
     }
 
     deletePost(postId: string) {
-        this.http
-            .delete(this.postsUrl + postId)
-            .subscribe(() => {
-                    const updatedPosts = this.posts.filter((post) => post.id !== postId)
-                    this.posts = updatedPosts;
-                    this.postsUpdated.next([...this.posts]);
-                }
-            );
+        return this.http.delete(this.postsUrl + postId);
     }
 }

@@ -69,12 +69,35 @@ router.post("", (req, res, next) => {
 
 // all
 router.get("", (req, res, next) => {
-    Post.find()
-        .then((posts => {
-            console.log("returning" + posts)
+    const pageSize = +req.query.pageSize; // the + makes it into a number
+    const currentPage = +req.query.page;
+    let fetchedPosts;
+    console.log("pagesize:" + pageSize);
+    console.log("currentPage: " + currentPage);
+
+    const postQuery = Post.find();
+
+    // if inputs are valid
+    if (pageSize && currentPage) {
+        let numOfPriorPages = currentPage - 1
+        let numItemsToSkip = pageSize * numOfPriorPages
+        console.log("numofPriorPages: " + numOfPriorPages);
+        console.log("numItemsToSkip: " + numItemsToSkip);
+        postQuery.skip(numItemsToSkip).limit(pageSize);
+    }
+
+    postQuery
+        // .find()
+        .then((documents) => {
+            fetchedPosts = documents;
+            console.log("num fetchedPosts: " + fetchedPosts.length)
+            return Post.estimatedDocumentCount()
+        })
+        .then((count => {
             res.status(200).json({
                 message: "Posts fetched successfully!",
-                posts: posts
+                posts: fetchedPosts,
+                maxPosts: count
             })
         }))
 });

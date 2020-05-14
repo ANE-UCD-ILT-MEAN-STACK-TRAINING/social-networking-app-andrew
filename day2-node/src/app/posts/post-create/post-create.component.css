@@ -18,3 +18,7 @@ input[type="file"] {
 .image-preview img {
     height: 100%;
 }
+
+mat-paginator {
+    margin-top: 1rem;
+}
