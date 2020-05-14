@@ -19,7 +19,7 @@ export class PostService {
     // get single
     getPost(id: string) {
         return this.http
-            .get<{ _id: string, title: string, content: string }>(this.postsUrl + id)
+            .get<{ _id: string, title: string, content: string, imagePath: string }>(this.postsUrl + id)
     }
 
     // get all
@@ -32,7 +32,8 @@ export class PostService {
                     return {
                         title: post.title,
                         content: post.content,
-                        id: post._id
+                        id: post._id,
+                        imagePath: post.imagePath
                     };
                 });
             }))
@@ -46,7 +47,7 @@ export class PostService {
         return this.postsUpdated.asObservable();
     }
 
-    addPost(title: string, content: string) {
+    addPost(title: string, content: string, image: File) {
         const postData = new FormData();
         postData.append("title", title);
         postData.append("content", content);
@@ -68,14 +69,34 @@ export class PostService {
     }
 
     updatePost(
-        id: string, title: string, content: string) {
-        const post: Post = {id: id, title: title, content: content}
+        id: string, title: string, content: string, image: File | string) {
+        let postData: Post | FormData;
+        if (typeof image === "object") {
+            postData = new FormData();
+            postData.append("id", id);
+            postData.append("title", title);
+            postData.append("content", content);
+            postData.append("image", image);
+        } else {
+            postData = {
+                id: id,
+                title: title,
+                content: content,
+                imagePath :image
+            }
+        }
 
-        this.http.put<{ message: string, postId: string }>(this.postsUrl + id, post)
+        this.http.put<{ message: string, postId: string }>(this.postsUrl + id, postData)
             .subscribe(responseData => {
                 console.log(responseData)
                 const updatedPosts = [...this.posts]
                 const oldPostIndex = updatedPosts.findIndex(p => p.id == post.id);
+                const post: Post = {
+                    id: id,
+                    title: title,
+                    content: content,
+                    imagePath: "" // TODO responseData.imagePath
+                };
                 updatedPosts[oldPostIndex] = post;
                 this.posts = updatedPosts;
                 this.postsUpdated.next([...this.posts])
