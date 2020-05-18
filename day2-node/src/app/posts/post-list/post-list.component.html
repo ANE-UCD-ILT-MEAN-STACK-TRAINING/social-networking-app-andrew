@@ -8,8 +8,8 @@
             <img [src]="post.imagePath" [alt]="post.title">
         </div>
         <p>{{post.content}}</p>
-        <mat-action-row>
-            <button mat-raised-button color="accent" [routerLink]="['/edit/', post.id]">EDIT</button>
+        <mat-action-row *ngIf="userIsAuthenticated">
+            <button mat-raised-button color="primary" [routerLink]="['/edit/', post.id]">EDIT</button>
             <button mat-raised-button color="warn" (click)="onDelete(post.id)">DELETE</button>
         </mat-action-row>
     </mat-expansion-panel>

@@ -3,6 +3,8 @@ const Post = require('../model/post')
 const router = express.Router();
 const multer = require('multer')
 
+const checkAuth = require('../middleware/check-auth')
+
 const MIME_TYPE_MAP = {
     "image/png": "png",
     "image/jpeg": "jpg",
@@ -25,11 +27,10 @@ const storage = multer.diskStorage({
     }
 });
 
-/**
- * Image upload
- */
+// create
 router.post(
     "",
+    checkAuth,
     multer({storage: storage}).single("image"),
     (req, res, next) => {
         const url = req.protocol + "://" + req.get("host");
@@ -38,6 +39,7 @@ router.post(
             content: req.body.content,
             imagePath: url + "/images/" + req.file.filename
         });
+        console.log("userId: " + req.userData.userId);
         post.save().then(createdPost => {
             res.status(201).json({
                 message: "Post added successfully",
@@ -50,22 +52,22 @@ router.post(
     }
 );
 
-router.post("", (req, res, next) => {
-    const post = new Post({
-        title: req.body.title,
-        content: req.body.content
-    })
-
-    post.save()
-        .then((createdPost => {
-            res.status(201).json({
-                messages: "Post added successfully",
-                postId: createdPost._id // return newly created ID
-            })
-        }))
-    // we still need to send the response as we don't want client to be waiting and timeout
-
-});
+// router.post("", (req, res, next) => {
+//     const post = new Post({
+//         title: req.body.title,
+//         content: req.body.content
+//     })
+//
+//     post.save()
+//         .then((createdPost => {
+//             res.status(201).json({
+//                 messages: "Post added successfully",
+//                 postId: createdPost._id // return newly created ID
+//             })
+//         }))
+//     // we still need to send the response as we don't want client to be waiting and timeout
+//
+// });
 
 // all
 router.get("", (req, res, next) => {
@@ -117,6 +119,7 @@ router.get('/:id', (req, res, next) => {
 })
 
 router.put('/:id',
+    checkAuth,
     multer({storage: storage}).single("image"),
     (req, res, next) => {
 
@@ -139,7 +142,9 @@ router.put('/:id',
             })
     })
 
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id",
+    checkAuth,
+    (req, res, next) => {
     Post.deleteOne({_id: req.params.id}).then(result => {
         console.log(result)
         res.status(200).json({message: "Post deleted!"})

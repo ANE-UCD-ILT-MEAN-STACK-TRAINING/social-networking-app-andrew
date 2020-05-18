@@ -14,7 +14,7 @@ export class PostService {
     }
 
     private apiUrl: string = "http://localhost:3000/api";
-    private postsUrl: string = this.apiUrl + "/posts/"
+    private postsUrl: string = this.apiUrl + "/post/"
 
     // get single
     getPost(id: string) {
@@ -48,7 +48,6 @@ export class PostService {
                     posts: [...this.posts],
                     postCount: transformedPostData.maxPosts
                 });
-
             })
     }
 
