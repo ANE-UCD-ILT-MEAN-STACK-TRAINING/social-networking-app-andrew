@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
         next();
     } catch (e) {
         res.status(401).json({
-            message: 'token invalid'
+            message: 'You are not authenticated!'
         })
     }
 }
