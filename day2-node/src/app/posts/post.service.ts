@@ -19,7 +19,14 @@ export class PostService {
     // get single
     getPost(id: string) {
         return this.http
-            .get<{ _id: string, title: string, content: string, imagePath: string }>(this.postsUrl + id)
+            .get<{
+                _id: string,
+                title: string,
+                content: string,
+                imagePath: string,
+                creator: string
+            }>
+            (this.postsUrl + id)
     }
 
     // get all
@@ -36,7 +43,8 @@ export class PostService {
                             title: post.title,
                             content: post.content,
                             id: post._id,
-                            imagePath: post.imagePath
+                            imagePath: post.imagePath,
+                            creator: post.creator
                         };
                     }),
                     maxPosts: postData.maxPosts
@@ -69,7 +77,11 @@ export class PostService {
     }
 
     updatePost(
-        id: string, title: string, content: string, image: File | string) {
+        id: string,
+        title: string,
+        content: string,
+        image: File | string) {
+
         let postData: Post | FormData;
         if (typeof image === "object") {
             postData = new FormData();
@@ -82,7 +94,8 @@ export class PostService {
                 id: id,
                 title: title,
                 content: content,
-                imagePath: image
+                imagePath: image,
+                creator: null
             }
         }
 
